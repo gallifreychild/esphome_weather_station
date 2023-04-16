@@ -1,0 +1,95 @@
+esphome:
+  name: weather-station-1
+  friendly_name: Weather Station 1
+  libraries:
+    - Wire
+  includes: weather_station_uart.h
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api: (your key)
+  
+
+ota:
+  password: (your password)
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Weather-Station-1"
+    password: (password)
+
+captive_portal:
+  
+i2c:
+  id: bus_a
+  sda: 21
+  scl: 22
+  scan: true
+uart:
+  id: uart_bus
+  tx_pin: GPIO17
+  rx_pin: GPIO16
+  baud_rate: 115200
+
+
+sensor:
+#  - platform: bme280
+#    i2c_id: bus_a
+#    address: 0x76
+#    temperature:
+#      name: "BME280 Temperature"
+#      oversampling: 16x
+#    pressure:
+#      name: "BME280 Pressure"
+#    humidity:
+#      name: "BME280 Humidity"
+#    update_interval: 60s
+    
+  - platform: custom
+    lambda: |-
+      auto weather_station = new weatherStation((uart_bus)); 
+      App.register_component(weather_station);
+      return {weather_station};
+    sensors:
+      - name: "Wind Direction"
+        unit_of_measurement: °
+        accuracy_decimals: "1"
+      #- name: "${friendly_short} Wind Current speed"
+      #  unit_of_measurement: kph
+      #  accuracy_decimals: 2
+      #- name: "${friendly_short} Curent Gust"
+      #  unit_of_measurement: kph
+      #  accuracy_decimals: 2
+      #- name: "${friendly_short} Current Gust Direction"
+      #  unit_of_measurement: °
+      #  accuracy_decimals: 2
+      #- name: "${friendly_short} Wind Speed (avg; 2min)"
+      #  unit_of_measurement: kph
+      #  accuracy_decimals: 2
+      #- name: "${friendly_short} Wind Direction (avg; 2min)"
+      #  unit_of_measurement: °
+      #  accuracy_decimals: 1
+      #- name: "${friendly_short} Wind gust (avg; 10min)"
+      #  unit_of_measurement: kph
+      #  accuracy_decimals: 1
+      #- name: "${friendly_short} Wind Direction (avg; 10min)"
+      #  unit_of_measurement: °
+      #  accuracy_decimals: 1
+      #- name: "${friendly_short} Rainfall (Sum; 1hr)"
+      #  unit_of_measurement: inches
+      #  accuracy_decimals: 2
+      #- name: "${friendly_short} Rainfall (Sum; 24hr)"
+      #  unit_of_measurement: inches
+      #  accuracy_decimals: 2
+      
